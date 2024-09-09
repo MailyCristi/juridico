@@ -1,30 +1,26 @@
-version: '3.7'
-
+version: "3.7"
 services:
-  app:
-    build:
-      context: ./
-      dockerfile: /docker/php/Dockerfile
-    container_name: laravel-app
-    ports:
-      - "300:8000"
-    volumes:
-      - ./juicio:/var/www
-    depends_on:
-      - db
 
-  db:
-    image: postgres:13
-    container_name: postgres-db
-    environment:
-      POSTGRES_DB: laravel
-      POSTGRES_USER: laravel_user
-      POSTGRES_PASSWORD: laravel_password
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
+    webserver:
+      image: nginx
+      container_name: webserver
+      working_dir: /gatewayJuridico
+      volumes:
+          - ./gatewayJuridico:/gatewayJuridico
+          - ./docker/nginx:/etc/nginx/conf.d
+      ports:
+       - "260:260"
+      networks:
+        - ipam
 
-volumes:
-  db_data:
-
+    php-fpm:
+      build: docker/php
+      container_name: phpfpm
+      working_dir: /gatewayJuridico
+      volumes:
+        - ./gatewayJuridico:/gatewayJuridico
+      networks:
+        - ipam
+networks:
+    ipam:
+        driver: bridge
